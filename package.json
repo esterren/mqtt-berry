@@ -1,0 +1,17 @@
+{
+  "name": "secmesbro-rpi",
+  "version": "0.0.1",
+  "author": "Renato Estermann",
+  "description": "a simple mqtt subscriber for rpi with controll to gpio",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "pi-gpio": ">=0.0.2",
+    "gpio":">=0.2.5",
+    "mqtt":"0.3.8"
+  },
+  "engines": {
+    "node": ">=v0.10.24"
+  }
+}
