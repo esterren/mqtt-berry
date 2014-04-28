@@ -1,11 +1,57 @@
+var mqtt = require("mqtt"),
+    Gpio = require("onoff").Gpio,
+    config = require("./config.json");
+//    leds = require("./leds.js");
 //var gpio = require("pi-gpio");
-var gpio = require("gpio");
+//gpio = require("gpio"),
 
-/*gpio.open(7, "output", function(err) {     // Open pin 16 for output
-    gpio.write(7, 1, function() {          // Set pin 16 high (1)
-        gpio.close(7);                     // Close pin 16
-    });
-});*/
+
+var ledarray = [];
+var basetopic = config.mqtt.options.clientId +'/berryclip/',
+    ledtopic = basetopic+'led/',
+    ledstatuspattern = new RegExp("^"+ledtopic.replace('/',"\\/")+'[0-9]+\/status',"g");
+
+client = mqtt.createClient(config.mqtt.port, config.mqtt.host, config.mqtt.options);
+client.subscribe(basetopic+'/#');
+
+config.berryclip.leds.forEach(function(obj){
+    console.log(obj, obj.gpio_nr,obj.direction);
+    var led = new Gpio(obj.gpio_nr,obj.direction);
+    obj.led = led;
+    console.log(obj);
+    ledarray.push(obj);
+    client.publish(ledtopic+obj.id+'/color', obj.color);
+    client.publish(ledtopic+obj.id+'/description', obj.description);
+    client.publish(ledtopic+obj.id+'/status', 'on');
+});
+
+
+client.on('message', function (topic, message) {
+
+    console.log(topic, message);
+    if(ledstatuspattern.test(topic)){
+        var ledid = topic.replace(ledtopic,'').match(/[0-9]+/g)[0];
+        console.log(ledid);
+
+        arrid = arrayObjectIndexOf(ledarray,ledid,'id');
+        if(message.toUpperCase()=='ON'){
+
+            ledarray[arrid].led.write(1, function(err) { // Asynchronous write.
+                if (err) throw err;
+            });
+        }else if(message.toUpperCase()=='OFF'){
+            ledarray[arrid].led.write(0, function(err) { // Asynchronous write.
+                if (err) throw err;
+            });
+        }
+
+    }
+});
+
+
+//client.end();
+
+/*
 
 var gpio4, gpio17, intervalTimer;
 
@@ -44,3 +90,12 @@ setTimeout(function() {
       process.exit(); // exits your node program
    });
 }, 10000);
+*/
+
+
+function arrayObjectIndexOf(myArray, searchTerm, property) {
+    for(var i = 0, len = myArray.length; i < len; i++) {
+        if (myArray[i][property] === searchTerm) return i;
+    }
+    return -1;
+}

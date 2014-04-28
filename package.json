@@ -9,6 +9,7 @@
   "dependencies": {
     "pi-gpio": ">=0.0.2",
     "gpio":">=0.2.5",
+    "onoff":">=0.3.2",
     "mqtt":"0.3.8"
   },
   "engines": {

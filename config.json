@@ -1,0 +1,87 @@
+{
+    "mqtt":
+    {  "host": "127.0.0.1",
+        "port": "1883",
+        "options":
+        {
+            "clientId":"RPi1"
+        }
+    },
+    "berryclip":
+    {
+        "leds":
+        [
+            {
+                "id":1,
+                "description":"LED 1",
+                "gpio_nr":4,
+                "direction": "out",
+                "color":"red"
+
+            },
+            {
+                "id":2,
+                "description":"LED 2",
+                "gpio_nr":17,
+                "direction": "out",
+                "color":"red"
+            },
+            {
+                "id":3,
+                "description":"LED 3",
+                "gpio_nr":22,
+                "direction": "out",
+                "color":"yellow"
+
+            },
+            {
+                "id":4,
+                "description":"LED 4",
+                "gpio_nr":10,
+                "direction": "out",
+                "color":"yellow"
+
+            },
+            {
+                "id":5,
+                "description":"LED 5",
+                "gpio_nr":9,
+                "direction": "out",
+                "color":"green"
+
+            },
+            {
+                "id":6,
+                "description":"LED 6",
+                "gpio_nr":11,
+                "direction": "out",
+                "color":"green"
+
+            }
+
+        ],
+        "buzzers":
+        [
+            {
+                "buzzer1":
+                {
+                    "description":"BUZZER 1",
+                    "gpio_nr":8,
+                    "direction": "out"
+                }
+            }
+        ],
+        "switches":
+        [
+            {
+                "switch1":
+                {
+                    "description":"SWITCH 1",
+                    "gpio_nr":7,
+                    "direction": "in"
+                }
+            }
+        ]
+    }
+
+}
