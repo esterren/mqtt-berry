@@ -1,12 +1,17 @@
 var mqtt = require("mqtt"),
     Gpio = require("onoff").Gpio,
+    sh = require('execSync'),
     config = require("./config.json");
 //    leds = require("./leds.js");
 //var gpio = require("pi-gpio");
 //gpio = require("gpio"),
 
+var ledStates= {
+        ON: {'value':1,'description':'ON'},
+        OFF:{'value':0,'description':'OFF'}
+}
 
-var ledarray = [];
+var ledsA = [];
 var basetopic = config.mqtt.options.clientId +'/berryclip/',
     ledtopic = basetopic+'led/',
     ledstatuspattern = new RegExp("^"+ledtopic.replace('/',"\\/")+'[0-9]+\/status',"g");
@@ -14,16 +19,24 @@ var basetopic = config.mqtt.options.clientId +'/berryclip/',
 client = mqtt.createClient(config.mqtt.port, config.mqtt.host, config.mqtt.options);
 client.subscribe(basetopic+'/#');
 
-config.berryclip.leds.forEach(function(obj){
-    console.log(obj, obj.gpio_nr,obj.direction);
-    var led = new Gpio(obj.gpio_nr,obj.direction);
-    obj.led = led;
-    console.log(obj);
-    ledarray.push(obj);
-    client.publish(ledtopic+obj.id+'/color', obj.color);
-    client.publish(ledtopic+obj.id+'/description', obj.description);
-    client.publish(ledtopic+obj.id+'/status', 'on');
-});
+(function initGPIOs(){
+    exportGPIOs();
+    if(config.berryclip.leds){
+        config.berryclip.leds.forEach(function(obj){
+            var ledObject = new Gpio(obj.gpio_nr,obj.direction);
+            obj.ledObject = ledObject;
+            obj.status = ledStates.ON;
+            console.log(obj);
+            ledsA.push(obj);
+            ledObject.writeSync(obj.status.value);
+            client.publish(ledtopic+obj.id+'/color', obj.color);
+            client.publish(ledtopic+obj.id+'/description', obj.description);
+            client.publish(ledtopic+obj.id+'/status', obj.status.description);
+        });
+
+    }
+})();
+
 
 
 client.on('message', function (topic, message) {
@@ -33,14 +46,15 @@ client.on('message', function (topic, message) {
         var ledid = topic.replace(ledtopic,'').match(/[0-9]+/g)[0];
         console.log(ledid);
 
-        arrid = arrayObjectIndexOf(ledarray,ledid,'id');
+        arrid = arrayObjectIndexOf(ledsA,ledid,'id');
+        console.log(arrid);
         if(message.toUpperCase()=='ON'){
 
-            ledarray[arrid].led.write(1, function(err) { // Asynchronous write.
+            ledsA[arrid].ledObject.write(1, function(err) { // Asynchronous write.
                 if (err) throw err;
             });
         }else if(message.toUpperCase()=='OFF'){
-            ledarray[arrid].led.write(0, function(err) { // Asynchronous write.
+            ledsA[arrid].ledObject.write(0, function(err) { // Asynchronous write.
                 if (err) throw err;
             });
         }
@@ -51,47 +65,6 @@ client.on('message', function (topic, message) {
 
 //client.end();
 
-/*
-
-var gpio4, gpio17, intervalTimer;
-
-// Flashing lights if LED connected to GPIO7
-gpio4 = gpio.export(4, {
-   ready: function() {
-      intervalTimer = setInterval(function() {
-         gpio4.set();
-         setTimeout(function() { gpio4.reset(); }, 500);
-      }, 1000);
-   }
-});
-
-// Lets assume a different LED is hooked up to pin 11, the following code
-// will make that LED blink inversely with LED from pin 7
-gpio17 = gpio.export(17, {
-   ready: function() {
-      // bind to gpio17's change event
-      gpio4.on("change", function(val) {
-         gpio17.set(1 - val); // set gpio11 to the opposite value
-      });
-   }
-});
-
-
-// reset the headers and unexport after 10 seconds
-setTimeout(function() {
-   clearInterval(intervalTimer);          // stops the voltage cycling
-   gpio4.removeAllListeners('change');   // unbinds change event
-   gpio4.reset();                        // sets header to low
-   gpio4.unexport();                     // unexport the header
-
-   gpio17.reset();
-   gpio17.unexport(function() {
-      // unexport takes a callback which gets fired as soon as unexporting is done
-      process.exit(); // exits your node program
-   });
-}, 10000);
-*/
-
 
 function arrayObjectIndexOf(myArray, searchTerm, property) {
     for(var i = 0, len = myArray.length; i < len; i++) {
@@ -99,3 +72,60 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     }
     return -1;
 }
+
+/*
+    This function exports all configured GPIOs,
+    because superuser privileges are required for exporting and using GPIOs on the RPi.
+ */
+function exportGPIOs(){
+    if(config.berryclip.leds){
+        config.berryclip.leds.forEach(function(obj){
+            console.log("Exporting GPIO Pin " +obj.gpio_nr);
+            var result = sh.exec('gpio-admin export '+ obj.gpio_nr+'; echo some_err 1>&2; exit 1');
+            console.log('return code ' + result.code);
+        });
+
+    }
+}
+
+/*
+    This function sets the IO-value to 0 and unexports the GPIOs
+ */
+function unexportGPIOs(){
+    if(config.berryclip.leds){
+        config.berryclip.leds.forEach(function(obj){
+
+            ledsA.forEach(function(obj){
+                obj.ledObject.write(0,function(){
+
+                    //console.log("Unexport GPIO Pin " +obj.gpio_nr);
+                    var result = sh.exec('gpio-admin unexport '+ obj.gpio_nr+'; echo some_err 1>&2; exit 1');
+                    //console.log('return code ' + result.code);
+                });
+            })
+        });
+
+    }
+}
+
+function exitHandler(options, err) {
+    if (options.cleanup){
+        console.log(' Exiting...');
+        unexportGPIOs();
+//        ledsA.forEach(function (led) {
+//            led.ledObject.writeSync(0);
+//            led.ledObject.unexport();
+//        });
+    }
+    if (err) console.log(err.stack);
+    if (options.exit) process.exit();
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
