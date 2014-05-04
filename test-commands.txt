@@ -1,0 +1,45 @@
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/1/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/2/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/4/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/5/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/7/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/5/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/6/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/1/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/1/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/0/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/0/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m ON
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/3/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/2/status  -m OFF
+pi@rpi ~ $ mosquitto_pub -h 192.168.1.20 -t RPi1/berryclip/leds/2/status  -m OFF
+
+
+
+mosquitto_sub -h 192.168.1.20 -i RPi -p 1883 -v -t test

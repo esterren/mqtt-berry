@@ -63,23 +63,21 @@
         "buzzers":
         [
             {
-                "buzzer1":
-                {
-                    "description":"BUZZER 1",
-                    "gpio_nr":8,
-                    "direction": "out"
-                }
+                "id":1,
+                "description":"BUZZER 1",
+                "gpio_nr":8,
+                "direction": "out"
             }
+
         ],
-        "switches":
+        "buttons":
         [
             {
-                "switch1":
-                {
-                    "description":"SWITCH 1",
-                    "gpio_nr":7,
-                    "direction": "in"
-                }
+                "id":1,
+                "description":"BUTTON 1",
+                "gpio_nr":7,
+                "direction": "in",
+                "edge":"both"
             }
         ]
     }

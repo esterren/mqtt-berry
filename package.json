@@ -1,14 +1,12 @@
 {
-  "name": "secmesbro-rpi",
+  "name": "mqtt-berry",
   "version": "0.0.1",
   "author": "Renato Estermann",
-  "description": "a simple mqtt subscriber for rpi with controll to gpio",
+  "description": "a simple mqtt publisher for rpi with controll to gpio (BerryClip)",
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "pi-gpio": ">=0.0.2",
-    "gpio":">=0.2.5",
     "onoff":">=0.3.2",
     "mqtt":"0.3.8",
      "execSync":"*"
