@@ -13,7 +13,7 @@ var ledsA = [],
     buzzerA = [],
     buttonA = [];
 
-var basetopic = config.mqtt.options.clientId +'/berryclip/',
+var basetopic = config.mqtt.connect_options.clientId +'/berryclip/',
     ledtopic = basetopic+'leds/',
     buzzertopic = basetopic+'buzzers/',
     buttontopic = basetopic+'buttons/',
@@ -21,51 +21,71 @@ var basetopic = config.mqtt.options.clientId +'/berryclip/',
     buzzerstatuspattern = new RegExp("^"+buzzertopic.replace('/',"\\/")+'[0-9]+\/status',"g"),
     buttonstatuspattern = new RegExp("^"+buttontopic.replace('/',"\\/")+'[0-9]+\/status',"g");
 
-client = mqtt.createClient(config.mqtt.port, config.mqtt.host, config.mqtt.options);
+client = mqtt.createClient(config.mqtt.port, config.mqtt.host, config.mqtt.connect_options);
 client.subscribe(basetopic+'/#');
 
 (function initGPIOs(){
     exportGPIOs();
-//    if(config.berryclip.leds){
-//        config.berryclip.leds.forEach(function(obj){
-//            var ledObject = new Gpio(obj.gpio_nr,obj.direction);
-//            obj.ledObject = ledObject;
-//            obj.status = onoffStates.ON;
-//            console.log(obj);
-//            ledsA.push(obj);
-//            ledObject.writeSync(obj.status.value);
-//            client.publish(ledtopic+obj.id+'/color', obj.color);
-//            client.publish(ledtopic+obj.id+'/description', obj.description);
-//            client.publish(ledtopic+obj.id+'/status', obj.status.description);
-//        });
-//
-//    }
+
+    function setupSensors(obj, propertyArray){
+
+
+    };
+
+    function setupActors(obj, topic, array, propertyArray){
+        var gpioObj = new Gpio(obj.gpio_nr, obj.direction, obj.edge);
+        obj.gpioObject = gpioObj;
+        obj.status= onoffStates.OFF;
+        console.log(obj);
+        array.push(obj);
+
+        gpioObj.watch(function(err, value){
+            if(err) exit();
+            obj.status = (value == onoffStates.ON.value)? onoffStates.ON : onoffStates.OFF;
+            mqttPublish(topic+obj.id+'/status', obj.status.description,config.mqtt.publish_options);
+
+        });
+        gpioObj.writeSync(obj.status.value);
+        propertyArray.forEach(function(entry){
+            mqttPublish(topic+obj.id+'/'+entry,obj[entry],config.mqtt.publish_options)
+        })
+
+    };
 
     if(config.berryclip.leds){
         config.berryclip.leds.forEach(function(obj){
-            var ledObject = new Gpio(obj.gpio_nr,obj.direction);
+            setupActors(obj, ledtopic,ledsA,["color","description"]);
+            /*var ledObject = new Gpio(obj.gpio_nr,obj.direction,obj.edge);
             obj.ledObject = ledObject;
             obj.status = onoffStates.OFF;
-            console.log(obj);
             ledsA.push(obj);
+
+            ledObject.watch(function(err, value){
+                if(err) exit();
+                console.log(obj.id, value);
+                obj.status = (value == onoffStates.ON.value)? onoffStates.ON : onoffStates.OFF;
+                mqttPublish(ledtopic+obj.id+'/status', obj.status.description,config.mqtt.publish_options);
+            });
+
             ledObject.writeSync(obj.status.value);
-            client.publish(ledtopic+obj.id+'/color', obj.color);
-            client.publish(ledtopic+obj.id+'/description', obj.description);
-            client.publish(ledtopic+obj.id+'/status', obj.status.description);
+            mqttPublish(ledtopic+obj.id+'/color', obj.color, config.mqtt.publish_options);
+            mqttPublish(ledtopic+obj.id+'/description', obj.description,config.mqtt.publish_options);
+            mqttPublish(ledtopic+obj.id+'/status', obj.status.description,config.mqtt.publish_options);
+*/
         });
 
     }
 
     if(config.berryclip.buzzers){
         config.berryclip.buzzers.forEach(function(obj){
-            var buzObject = new Gpio(obj.gpio_nr,obj.direction);
+            setupActors(obj, buzzertopic,buzzerA,["description"]);
+            /*var buzObject = new Gpio(obj.gpio_nr,obj.direction);
             obj.buzObject = buzObject;
             obj.status = onoffStates.OFF;
-            console.log(obj);
             buzzerA.push(obj);
             buzObject.writeSync(obj.status.value);
             client.publish(buzzertopic+obj.id+'/description', obj.description);
-            client.publish(buzzertopic+obj.id+'/status', obj.status.description);
+            client.publish(buzzertopic+obj.id+'/status', obj.status.description);*/
         });
 
     }
@@ -74,15 +94,15 @@ client.subscribe(basetopic+'/#');
             var butObject = new Gpio(obj.gpio_nr,obj.direction,obj.edge);
             obj.butObject = butObject;
             obj.status = onoffStates.OFF;
-            console.log(obj);
+
             buttonA.push(obj);
             butObject.watch(function(err, value){
                 if(err) exit();
                 ledsA.forEach(function(obj){
-                    obj.ledObject.writeSync(value);
+                    obj.gpioObject.writeSync(value);
                 });
                 buzzerA.forEach(function(obj){
-                    obj.buzObject.writeSync(value);
+                    obj.gpioObject.writeSync(value);
                 })
 
             });
@@ -105,7 +125,7 @@ client.on('message', function (topic, message) {
         if(tlid>=0){
             if(onoffStates[message.toUpperCase()]){
 
-                ledsA[tlid].ledObject.write(onoffStates[message.toUpperCase()].value, function(err) { // Asynchronous write.
+                ledsA[tlid].gpioObject.write(onoffStates[message.toUpperCase()].value, function(err) { // Asynchronous write.
                     if (err) throw err;
                     //ledsA[tlid].status = onoffStates.ON;
                 });
@@ -114,6 +134,10 @@ client.on('message', function (topic, message) {
     }
 });
 
+function mqttPublish(topic, message, options, callback){
+    client.publish(topic,message, options, callback);
+
+}
 
 //client.end();
 
@@ -161,7 +185,7 @@ function unexportGPIOs(){
         config.berryclip.leds.forEach(function(obj){
 
             ledsA.forEach(function(obj){
-                obj.ledObject.write(0,function(){
+                obj.gpioObject.write(0,function(){
 
                     //console.log("Unexport GPIO Pin " +obj.gpio_nr);
                     var result = sh.exec('gpio-admin unexport '+ obj.gpio_nr+'; echo some_err 1>&2; exit 1');
@@ -173,14 +197,14 @@ function unexportGPIOs(){
     }
 }
 
+function exit() {
+    process.exit();
+}
+
 function exitHandler(options, err) {
     if (options.cleanup){
         console.log(' Exiting...');
         unexportGPIOs();
-//        ledsA.forEach(function (led) {
-//            led.ledObject.writeSync(0);
-//            led.ledObject.unexport();
-//        });
     }
     if (err) console.log(err.stack);
     if (options.exit) process.exit();

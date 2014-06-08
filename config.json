@@ -1,10 +1,15 @@
 {
     "mqtt":
-    {  "host": "192.168.1.20",
+    {
+        "host": "192.168.100.20",
         "port": "1883",
-        "options":
+        "connect_options":
         {
             "clientId":"RPi1"
+        },
+        "publish_options":{
+            "qos":1,
+            "retain":true
         }
     },
     "berryclip":
@@ -16,49 +21,49 @@
                 "description":"LED 1",
                 "gpio_nr":4,
                 "direction": "out",
-                "color":"red"
-
+                "color":"red",
+                "edge":"both"
             },
             {
                 "id":2,
                 "description":"LED 2",
                 "gpio_nr":17,
                 "direction": "out",
-                "color":"red"
+                "color":"red",
+                "edge":"both"
             },
             {
                 "id":3,
                 "description":"LED 3",
                 "gpio_nr":22,
                 "direction": "out",
-                "color":"yellow"
-
+                "color":"yellow",
+                "edge":"both"
             },
             {
                 "id":4,
                 "description":"LED 4",
                 "gpio_nr":10,
                 "direction": "out",
-                "color":"yellow"
-
+                "color":"yellow",
+                "edge":"both"
             },
             {
                 "id":5,
                 "description":"LED 5",
                 "gpio_nr":9,
                 "direction": "out",
-                "color":"green"
-
+                "color":"green",
+                "edge":"both"
             },
             {
                 "id":6,
                 "description":"LED 6",
                 "gpio_nr":11,
                 "direction": "out",
-                "color":"green"
-
+                "color":"green",
+                "edge":"both"
             }
-
         ],
         "buzzers":
         [
@@ -66,9 +71,9 @@
                 "id":1,
                 "description":"BUZZER 1",
                 "gpio_nr":8,
-                "direction": "out"
+                "direction": "out",
+                "edge":"both"
             }
-
         ],
         "buttons":
         [
@@ -81,5 +86,4 @@
             }
         ]
     }
-
 }
