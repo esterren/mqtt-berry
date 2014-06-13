@@ -1,23 +1,20 @@
-var SECURE_CERT = __dirname + '/cert/server-cert.pem';
-
 var mqtt = require('mqtt'),
-    port = 8443,
+    port = 1883,
     host = '192.168.1.20',
     options = {
-        certPath: SECURE_CERT,
-        clientId:"test123"
-        /*will:{
+        clientId:process.argv[2],
+        will:{
             topic:'presence',
             payload:'rpi failed',
             qos:1,
             retain:true
         },
-        clean:false*/
+        clean:false
     };
 
 
-client = mqtt.createSecureClient(port, host, options);
-  // or , client = mqtt.createClient(1883, host, {keepalive: 10000});
+client = mqtt.createClient(port, host, options);
+// or , client = mqtt.createClient(1883, host, {keepalive: 10000});
 
 
 client.on('message', function (topic, message) {

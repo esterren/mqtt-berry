@@ -2,10 +2,17 @@
     "mqtt":
     {
         "host": "192.168.100.20",
-        "port": "1883",
+        "port": "8883",
         "connect_options":
         {
-            "clientId":"RPi1"
+            "clientId":"RPi1",
+            "certPath": "./cert/server-cert.pem",
+            "will":{
+                "topic":"RPi1/status",
+                "payload":"OFFLINE",
+                "qos":1,
+                "retain":true
+            }
         },
         "publish_options":{
             "qos":1,
