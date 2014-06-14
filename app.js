@@ -131,13 +131,26 @@ client.on('message', function (topic, message) {
             // ... and the message is ON or OFF
             if(onoffStates[message.toUpperCase()]){
                 // Clear the timeout Object for buzzer topic
-                if(topic.match(/\/buzzers\/\d\/status/g)&& timeoutObj){
-                    clearTimeout(timeoutObj)
-                };
-                // then the gpioObject will get the new state (ON or OFF)
-                obj.gpioObject.write(onoffStates[message.toUpperCase()].value,function(err){
-                    if (err) throw err;
-                });
+                if(topic.match(/\/buzzers\/\d\/status/g)){
+                    if(timeoutObj){
+                        if(message.toUpperCase() ==onoffStates.OFF.description){
+                            clearTimeout(timeoutObj);
+                            timeoutObj =null;
+                            obj.gpioObject.write(onoffStates[message.toUpperCase()].value,function(err){
+                                if (err) throw err;
+                            });
+                        }
+                    }else {
+                        obj.gpioObject.write(onoffStates[message.toUpperCase()].value,function(err){
+                            if (err) throw err;
+                        });
+                    }
+                }else{
+                    // then the gpioObject will get the new state (ON or OFF)
+                    obj.gpioObject.write(onoffStates[message.toUpperCase()].value,function(err){
+                        if (err) throw err;
+                    });
+                }
             }
 
             // schedule a timeout for the buzzer if the message is a number betw. 0 and 31
